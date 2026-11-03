@@ -88,9 +88,28 @@ fun QuizScreen(modifier: Modifier = Modifier) {
                 Text("Это был последний вопрос", fontSize = 14.sp)
             }
 
-            // Финальная проверка (пока выведем текстом)
+            // Показываем диалог после последнего ответа
             if (answered && currentIndex == questionBank.size - 1) {
-                Text("Правильных ответов: $correctCount из ${questionBank.size}")
+                showResult = true
+            }
+            // Всплывающее окно с результатом
+            if (showResult) {
+                AlertDialog(
+                    onDismissRequest = { showResult = false },
+                    title = { Text("Викторина завершена!") },
+                    text = {
+                        Text("Правильных ответов: $correctCount из ${questionBank.size}")
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showResult = false
+                            // Сброс на первый вопрос
+                            currentIndex = 0
+                            answered = false
+                            correctCount = 0
+                        }) { Text("Начать заново") }
+                    }
+                )
             }
         }
     }
