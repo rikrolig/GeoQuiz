@@ -4,13 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.geoquiz.ui.theme.GeoQuizTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,10 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             GeoQuizTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    QuizScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -31,17 +28,65 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun QuizScreen(modifier: Modifier = Modifier) {
+    var currentIndex by remember { mutableIntStateOf(0) }
+    var answered by remember { mutableStateOf(false) }
+    var correctCount by remember { mutableIntStateOf(0) }
+    var showResult by remember { mutableStateOf(false) }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GeoQuizTheme {
-        Greeting("Android")
+    val question = questionBank[currentIndex]
+
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(24.dp)
+        ) {
+            // Индикатор прогресса
+            Text("Вопрос ${currentIndex + 1} из ${questionBank.size}", fontSize = 16.sp)
+            Spacer(Modifier.height(16.dp))
+
+            // Текст вопроса
+            Text(
+                text = question.text,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+
+            // Кнопки True / False (скрываются после ответа)
+            if (!answered) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Button(onClick = {
+                        answered = true
+                        if (question.answer) correctCount++
+                    }) { Text("True") }
+
+                    Button(onClick = {
+                        answered = true
+                        if (!question.answer) correctCount++
+                    }) { Text("False") }
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // Кнопка Next (скрывается на последнем вопросе)
+            if (currentIndex < questionBank.size - 1) {
+                Button(
+                    onClick = {
+                        currentIndex++
+                        answered = false
+                    }
+                ) { Text("Next") }
+            }
+
+            // Финальная проверка (пока выведем текстом)
+            if (answered && currentIndex == questionBank.size - 1) {
+                Text("Правильных ответов: $correctCount из ${questionBank.size}")
+            }
+        }
     }
 }
