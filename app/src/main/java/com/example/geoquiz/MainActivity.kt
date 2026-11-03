@@ -53,8 +53,7 @@ fun QuizScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(16.dp)
             )
             Spacer(Modifier.height(16.dp))
-
-            // Кнопки True / False (скрываются после ответа)
+            // Кнопки True / False — скрываются после ответа
             if (!answered) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -69,11 +68,14 @@ fun QuizScreen(modifier: Modifier = Modifier) {
                         if (!question.answer) correctCount++
                     }) { Text("False") }
                 }
+            } else {
+                // Показываем, что ответ дан
+                Text("Ответ принят", fontSize = 14.sp)
             }
 
             Spacer(Modifier.height(24.dp))
 
-            // Кнопка Next (скрывается на последнем вопросе)
+            // Кнопка Next — скрывается на последнем вопросе
             if (currentIndex < questionBank.size - 1) {
                 Button(
                     onClick = {
@@ -81,6 +83,9 @@ fun QuizScreen(modifier: Modifier = Modifier) {
                         answered = false
                     }
                 ) { Text("Next") }
+            } else if (answered) {
+                // На последнем вопросе после ответа Next скрыт
+                Text("Это был последний вопрос", fontSize = 14.sp)
             }
 
             // Финальная проверка (пока выведем текстом)
